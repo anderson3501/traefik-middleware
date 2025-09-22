@@ -83,6 +83,7 @@ def create_persona():
         "message": "Persona creada exitosamente",
         "data": created_persona
     }), 201
+    
 
 
 if __name__ == "__main__":
