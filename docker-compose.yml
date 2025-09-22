@@ -13,7 +13,30 @@ services:
       - firstnet
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      
+    labels:
+      - "traefik.enable=true"
+      # Configuración del dashboard
+      - "traefik.http.routers.traefik-dashboard.entrypoints=web"
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`ops.localhost`) && PathPrefix(`/dashboard`)"
+      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+      - "traefik.http.routers.traefik-dashboard.middlewares=auth-middleware@docker,error-middleware@docker"
+      # Definición de la autenticación
+      - "traefik.http.middlewares.auth-middleware.basicauth.users=admin:{noop}dani"
+      # Definición del middleware de error
+      - "traefik.http.middlewares.error-middleware.errors.status=404-599"
+      - "traefik.http.middlewares.error-middleware.errors.service=error-pages@docker"
+
+  error-pages:
+    image: nginx:alpine
+    restart: always
+    volumes:
+      - ./error-pages:/usr/share/nginx/html:ro
+    networks:
+      - firstnet
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.error-pages.loadbalancer.server.port=80"
+  
   neo4j:
     image: neo4j:5.22.0-community
     container_name: neo4j_db
@@ -22,28 +45,40 @@ services:
       NEO4J_AUTH: "${NEO4J_USER}/${NEO4J_PASSWORD}"
     volumes:
       - neo4j_data:/data
-    ports:
+    networks:
       - firstnet
-      
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-a", "bolt://localhost:7687", "-u", "$NEO4J_USER", "-p", "$NEO4J_PASSWORD", "RETURN 1"]
+      interval: 5s
+      timeout: 20s
+      retries: 5
+      start_period: 30s
 
   backend_flask:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: flask_backend
     restart: always
     depends_on:
-      - neo4j
+      neo4j:
+        condition: service_healthy
     env_file:
       - .env
-    ports:
+    networks:
       - firstnet
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.flask.rule=Host(`api.localhost`)"
+      - "traefik.http.routers.flask.entrypoints=web"
+      - "traefik.http.routers.flask.middlewares=ratelimit-middleware@docker,error-middleware@docker"
+      - "traefik.http.services.flask.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.ratelimit-middleware.rateLimit.average=100"
+      - "traefik.http.middlewares.ratelimit-middleware.rateLimit.burst=50"
 
 volumes:
   neo4j_data:
     driver: local
-    
+
 networks:
   firstnet:
     driver: bridge
-    
