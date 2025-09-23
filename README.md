@@ -327,7 +327,7 @@ al dejar el dashboard abierto podemos exponer la posible información sensible q
 para poder mitigar esto es necesario usar los middlewares de autentificación como authbasic para dar acceso solo a ip confiables, y evitar exponer las rutas sensibles, también mantener nuestro traefik y middlewares siempre actualizadas
 
 ## Integrantes
-## Daniel ALejandro Reyes Leon
+## Daniel Alejandro Reyes León
 ## Anderson Eduardo Carvajal Oliveros
 
 
