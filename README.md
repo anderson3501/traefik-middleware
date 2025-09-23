@@ -2,8 +2,8 @@
 
 TALLER Gateway de servicios con Traefik
 1. Diagrama simple de la solución (Traefik, API (x2), Neo4j) y redes.
-![Diagrama traefik](https://github.com/user-attachments/assets/456d7171-9eda-4ce1-92b2-8a842c5c93a3)
 
+![Diagrama traefik](https://github.com/user-attachments/assets/456d7171-9eda-4ce1-92b2-8a842c5c93a3)
 
 2. Los host cofigurados para el enrrutamineto de traefik son:
 
