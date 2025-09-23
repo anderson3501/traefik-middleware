@@ -14,7 +14,14 @@ TALLER Gateway de servicios con Traefik
   3.1. API en api.localhost responde a /health
     <img width="923" height="229" alt="image" src="https://github.com/user-attachments/assets/c832ca66-7106-416c-a671-8521f7570f74" />
   3.2. Dashboard accesible solo en ops.localhost/dashboard/ y con autenticación
+    <img width="1456" height="922" alt="image" src="https://github.com/user-attachments/assets/bd298413-bbb8-455b-91c2-25690b93b23b" />
+
   3.3. Servicios y Routers visibles en el Dashboard
+  <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/6f061fc4-5eb5-40e1-aebe-02ea9be40760" />
+  <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/62942c06-62e3-466b-b041-f030b3bfcf39" />
+  <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/6a63e2b2-b599-4b27-b002-ef5498a17f20" />
+  <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c8fdd55e-430d-430a-ab37-a53c80880ecb" />
+
   3.4. Rate-limit o stripPrefix aplicado y verificado: Aca se demuestra la efectividad del reateLimit con un buvle de 300 peticiones donde no pudo responde 133 que esta en falied por el rate de 100 que le interpusimos  
     daniel-reyes@daniel-reyes-VirtualBox:~/traefik-middleware$ ab -n 200 -c 100 http://api.localhost/
   This is ApacheBench, Version 2.3 <$Revision: 1903618 $>
