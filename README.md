@@ -1,7 +1,8 @@
 # traefik-middleware
 
 TALLER Gateway de servicios con Traefik
-1. 
+1. Diagrama simple de la solución (Traefik, API (x2), Neo4j) y redes.
+<img width="371" height="421" alt="Diagrama traefik drawio" src="https://github.com/user-attachments/assets/e6b17cbb-db98-4491-b0c8-24fcf39d8b5e" />
 
 2. Los host cofigurados para el enrrutamineto de traefik son:
 
@@ -295,6 +296,27 @@ Bonus Parcial
 
 Paginar de error 404  personalizada 
 <img width="1797" height="1012" alt="image" src="https://github.com/user-attachments/assets/d8163f24-da2c-489d-b4bb-79de57e7cf4a" />
+
+4. Breve reflexión técnica:
+
+¿Qué aporta Traefik frente a mapear puertos directamente?
+
+Traefik nos da mas control ya que detecta los nuevos sevicios y los enruta segun los labels que configuremos, una mejor seguridad mediante los middlewares, permite distribuir el trafico de peticiones, esto mejora la escalabilidad  y la disponibilidad de la api, mientras que al mapear los puertos nos exponemos al exponer los puertos, esto da menor seguridad para la api
+
+¿Qué middlewares usarían en producción y por qué?
+
+Algunos de los middlewares que usaría en producción son: 
+- IpAllowList ya que esta acepta o rechaza las solicitudes que se hacen según la ip del cliente que las realiza
+- BasicAuth esta es importante para realizar las autenticaciones y que sea mas fácil de proteger las rutas ya que solo accedera quien tenga las credenciales
+- RedirectScheme ese fuerza la dirección http a https y la convierte en mas segura
+- Headers este middleware administra las solicitudes y los permite modificar o eliminar si es necesario 
+- StripPrefix esta es para cuando tenemos muchas rutas de microservicios y los enruta bajo un mismo dominio quitando un prefijo de la ruta original
+
+Riesgos de dejar el dashboard “abierto” y cómo mitigarlos.
+
+al dejar el dashboard abierto podemos exponer la posible información sensible que tengamos, como de claves credenciales o las bases de datos de los usuarios y empleados, algún atacante poddria realizar cambios que no sean deseados en nuestra api y tambine manipular las rutas y encontrar mas vulnerabilidades de las que aprovecharse
+
+para poder mitigar esto es necesario usar los middlewares de autentificación como authbasic para dar acceso solo a ip confiables, y evitar exponer las rutas sensibles, también mantener nuestro traefik y middlewares siempre actualizadas
 
 
 
