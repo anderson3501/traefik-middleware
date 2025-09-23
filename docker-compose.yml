@@ -4,7 +4,7 @@ services:
     container_name: traefik
     command:
       - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.exposedbydefault=true"
       - "--entrypoints.web.address=:80"
       - "--api.dashboard=true"
     ports:
@@ -15,28 +15,11 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - "traefik.enable=true"
-      # Configuración del dashboard
-      - "traefik.http.routers.traefik-dashboard.entrypoints=web"
-      - "traefik.http.routers.traefik-dashboard.rule=Host(`ops.localhost`) && PathPrefix(`/dashboard`)"
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`ops.localhost`) && (PathPrefix(`/debug`) ||PathPrefix(`/api/http`) || PathPrefix(`/api/tcp`) || PathPrefix(`/api/udp`) || PathPrefix(`/api/entrypoints`) || PathPrefix(`/api/overview`) || PathPrefix(`/api/rawdata`) || PathPrefix(`/api/version`) || PathPrefix(`/dashboard`))"
       - "traefik.http.routers.traefik-dashboard.service=api@internal"
-      - "traefik.http.routers.traefik-dashboard.middlewares=auth-middleware@docker,error-middleware@docker"
-      # Definición de la autenticación
-      - "traefik.http.middlewares.auth-middleware.basicauth.users=admin:{noop}dani"
-      # Definición del middleware de error
-      - "traefik.http.middlewares.error-middleware.errors.status=404-599"
-      - "traefik.http.middlewares.error-middleware.errors.service=error-pages@docker"
+      - "traefik.http.routers.traefik-dashboard.middlewares=dashboard-auth"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.users=admin:$$apr1$$m2MOuBMZ$$0ofBV.LI59RtR4Id9lBkg." 
 
-  error-pages:
-    image: nginx:alpine
-    restart: always
-    volumes:
-      - ./error-pages:/usr/share/nginx/html:ro
-    networks:
-      - firstnet
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.error-pages.loadbalancer.server.port=80"
-  
   neo4j:
     image: neo4j:5.22.0-community
     container_name: neo4j_db
@@ -70,7 +53,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.flask.rule=Host(`api.localhost`)"
       - "traefik.http.routers.flask.entrypoints=web"
-      - "traefik.http.routers.flask.middlewares=ratelimit-middleware@docker,error-middleware@docker"
+      - "traefik.http.routers.flask.middlewares=ratelimit-middleware@docker"
       - "traefik.http.services.flask.loadbalancer.server.port=5000"
       - "traefik.http.middlewares.ratelimit-middleware.rateLimit.average=100"
       - "traefik.http.middlewares.ratelimit-middleware.rateLimit.burst=50"
